@@ -43,8 +43,8 @@ export default function AdminUpload() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-100 to-[#ff8904] flex items-center justify-center px-4">
-      <div className="max-w-md w-full bg-white p-6 rounded-2xl shadow-lg space-y-6">
+    <div className="min-h-screen bg-gradient-to-b from-orange-100 to-[#ff8904] flex flex-col md:flex-row items-center justify-center px-2 md:px-4 py-6">
+      <div className="w-full max-w-md bg-white p-4 md:p-6 rounded-2xl shadow-lg space-y-6">
         <div className="space-y-2 text-sm">
           <p>
             Upload PDF or Ingest from URL
@@ -87,7 +87,11 @@ export default function AdminUpload() {
         </form>
       </div>
 
-      <img src="/logo.svg" alt="logo" className="h-100 ml-6 hidden md:block" />
+      <img
+        src="/logo.svg"
+        alt="logo"
+        className="h-24 md:h-40 mt-8 md:mt-0 md:ml-6 block mx-auto md:block"
+      />
     </div>
   );
 }
