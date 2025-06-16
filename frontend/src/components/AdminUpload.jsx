@@ -28,7 +28,7 @@ export default function AdminUpload() {
     e.preventDefault();
     if (!url) return alert("Please enter a valid URL.");
 
-    fetch("url", {
+    fetch("url/", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url }),

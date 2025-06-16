@@ -6,11 +6,6 @@ export default function ChatBox() {
   const [input, setInput] = useState("");
   const chatEndRef = useRef(null);
 
-  // Function to send message
-  // and handle response from the server
-  // This function is called when the user submits the form
-  // It sends the user's message to the server
-  // and updates the chat with the bot's response
   const sendMessage = (e) => {
     e.preventDefault();
 
@@ -55,7 +50,7 @@ export default function ChatBox() {
             }`}
           >
             <div
-              className={`px-4 py-2 max-w-[75%] rounded-lg text-sm whitespace-pre-line ${
+              className={`px-4 py-4 max-w-[75%] rounded-lg text-sm whitespace-pre-line ${
                 msg.sender === "user"
                   ? "bg-orange-600 text-white rounded-br-none"
                   : "bg-orange-200 text-orange-900 rounded-bl-none"
