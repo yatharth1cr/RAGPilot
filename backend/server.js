@@ -21,9 +21,13 @@ app.use(
     resave: false,
     saveUninitialized: true,
     cookie: {
+      httpOnly: true, // Prevent client-side JavaScript from accessing the cookie
       secure: process.env.NODE_ENV === "production", // Use secure cookies in production
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
+    store: MongoStore.create({
+      mongoUrl: process.env.MONGO_URI,
+    }),
   })
 );
 

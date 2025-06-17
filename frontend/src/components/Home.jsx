@@ -125,19 +125,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="mt-24 text-center px-2 sm:px-4">
-        <h3 className="text-2xl sm:text-3xl font-semibold text-orange-800 mb-4">
-          🚀Ready to supercharge your PDFs with AI?
-        </h3>
-        <Link
-          to="/chat"
-          className="inline-block bg-orange-600 text-white px-10 py-4 rounded-full hover:bg-orange-700 transition font-semibold text-lg shadow-md"
-        >
-          Start Chatting Now
-        </Link>
-      </section>
     </main>
   );
 }
