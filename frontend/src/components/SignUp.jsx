@@ -1,10 +1,10 @@
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import { useNavigate, Link } from "react-router-dom";
-import { useState } from "react";
 import { Toaster, toast } from "sonner";
+import axios from "../utils/axios"; // Make sure axios is configured properly
 
-// Validation schema using Yup
+// Validation schema
 const SignupSchema = Yup.object().shape({
   email: Yup.string().email("Invalid email").required("Required"),
   password: Yup.string()
@@ -12,38 +12,26 @@ const SignupSchema = Yup.object().shape({
     .max(10, "Password must be at most 10 characters")
     .required("Required")
     .matches(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$/,
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/,
       "Password must include uppercase, lowercase, number, and special character"
     ),
 });
 
 export default function Signup({ role }) {
   const navigate = useNavigate();
-  const [serverError, setServerError] = useState("");
 
   const handleSignup = async (values, { setSubmitting }) => {
-    const signupData = { ...values, role };
-    console.log("Signup data:", signupData);
-
     try {
-      const res = await fetch("http://localhost:5000/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(signupData),
-      });
+      await axios.post("/auth/signup", { ...values, role });
+      toast.success("Signup successful!");
 
-      const data = await res.json();
-
-      if (res.ok) {
-        toast.success("Signup successful!");
-        console.log("Signup successful:", role);
+      setTimeout(() => {
         navigate(role === "admin" ? "/login/admin" : "/login/user");
-      } else {
-        toast.error(data.message || "Signup failed.");
-      }
+      }, 1500);
     } catch (error) {
-      setServerError("Server error, please try again later.");
-      toast.error(error.message || serverError);
+      const message =
+        error?.response?.data?.message || "Signup failed. Try again.";
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
@@ -112,6 +100,7 @@ export default function Signup({ role }) {
           )}
         </Formik>
       </div>
+
       <Toaster richColors position="top-center" />
     </div>
   );
