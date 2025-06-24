@@ -1,8 +1,54 @@
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet";
+import { useAuth } from "../context/AuthContext";
 
 export default function Home() {
+  const { currentUser } = useAuth();
+  const isAdmin = currentUser?.role === "admin";
+
+  const features = [
+    {
+      icon: "📄",
+      title: "Upload PDFs & URLs",
+      desc: "Ingest structured or unstructured data by uploading files or providing links to web content.",
+    },
+    {
+      icon: "💬",
+      title: "Chat with Your Data",
+      desc: "Interact with documents through a conversational AI that retrieves context-specific answers.",
+    },
+    {
+      icon: "🔐",
+      title: "Admin Panel",
+      desc: "Access control and ingestion management for moderators and developers.",
+    },
+    {
+      icon: "🧠",
+      title: "LangChain + RAG",
+      desc: "Empowered by cutting-edge Retrieval Augmented Generation and LangChain pipelines.",
+    },
+    {
+      icon: "⚡",
+      title: "Fast & Scalable",
+      desc: "Works seamlessly for small documents to large knowledge bases using vector DBs.",
+    },
+    {
+      icon: "🌐",
+      title: "Web & Document Friendly",
+      desc: "Supports HTML content and multi-page PDFs — making RAGPilot highly versatile.",
+    },
+  ];
+
   return (
     <main className="bg-gradient-to-b from-orange-100 to-orange-300 min-h-screen py-16 px-4 sm:px-6 lg:px-24">
+      <Helmet>
+        <title>RAGPilot | AI Chat with Your Docs</title>
+        <meta
+          name="description"
+          content="Interact with your documents using RAG + LangChain. Upload PDFs or URLs and chat with your data."
+        />
+      </Helmet>
+
       {/* Hero Section */}
       <section className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
         {/* Text */}
@@ -21,15 +67,19 @@ export default function Home() {
             <Link
               to="/chat"
               className="bg-orange-600 text-white px-6 py-3 rounded-md hover:bg-orange-700 transition font-semibold text-lg shadow-md"
+              aria-label="Try Chat"
             >
               💬 Try Chat
             </Link>
-            <Link
-              to="/admin"
-              className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition font-semibold text-lg shadow-md"
-            >
-              ⚙️ Admin Panel
-            </Link>
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition font-semibold text-lg shadow-md"
+                aria-label="Admin Panel"
+              >
+                ⚙️ Admin Panel
+              </Link>
+            )}
           </div>
         </div>
 
@@ -38,6 +88,7 @@ export default function Home() {
           <img
             src="/logo.svg"
             alt="RAGPilot AI Logo"
+            onError={(e) => (e.target.src = "/fallback-logo.png")}
             className="w-full max-w-xs sm:max-w-sm md:max-w-md lg:max-w-sm drop-shadow-xl"
           />
         </div>
@@ -49,38 +100,7 @@ export default function Home() {
           ✨ Key Features of RAGPilot
         </h2>
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-          {[
-            {
-              icon: "📄",
-              title: "Upload PDFs & URLs",
-              desc: "Ingest structured or unstructured data by uploading files or providing links to web content.",
-            },
-            {
-              icon: "💬",
-              title: "Chat with Your Data",
-              desc: "Interact with documents through a conversational AI that retrieves context-specific answers.",
-            },
-            {
-              icon: "🔐",
-              title: "Admin Panel",
-              desc: "Access control and ingestion management for moderators and developers.",
-            },
-            {
-              icon: "🧠",
-              title: "LangChain + RAG",
-              desc: "Empowered by cutting-edge Retrieval Augmented Generation and LangChain pipelines.",
-            },
-            {
-              icon: "⚡",
-              title: "Fast & Scalable",
-              desc: "Works seamlessly for small documents to large knowledge bases using vector DBs.",
-            },
-            {
-              icon: "🌐",
-              title: "Web & Document Friendly",
-              desc: "Supports HTML content and multi-page PDFs — making RAGPilot highly versatile.",
-            },
-          ].map(({ icon, title, desc }, index) => (
+          {features.map(({ icon, title, desc }, index) => (
             <div
               key={index}
               className="bg-white shadow-md rounded-xl p-6 text-center hover:shadow-lg hover:-translate-y-1 transition-all"
@@ -120,7 +140,8 @@ export default function Home() {
             <img
               src="/chat-preview.svg"
               alt="Chat preview"
-              className="rounded-xl shadow-lg max-w-sm w-full"
+              className="max-w-sm w-full"
+              onError={(e) => (e.target.src = "/fallback-chat.svg")}
             />
           </div>
         </div>

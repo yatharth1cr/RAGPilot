@@ -43,11 +43,6 @@ export default function Footer() {
                 Admin
               </Link>
             </li>
-            <li>
-              <Link to="/docs" className="hover:text-orange-500">
-                Docs
-              </Link>
-            </li>
           </ul>
         </div>
 

@@ -1,22 +1,100 @@
-import { Link } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { useState, useEffect, useRef } from "react";
 import { Menu, X } from "lucide-react";
+import { toast } from "sonner";
+import { useAuth } from "../context/AuthContext";
 
 export default function Header() {
-  const [showMenu, setShowMenu] = useState(false);
-  const [showMobileNav, setShowMobileNav] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
   const dropdownRef = useRef(null);
 
-  // Close dropdown if clicked outside
+  const { currentUser, logout } = useAuth();
+  const isAdmin = currentUser?.role === "admin";
+
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setShowMenu(false);
+    const handleClickOutside = (e) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleLogout = () => {
+    logout();
+    toast.success("Logged out!");
+    setIsMenuOpen(false);
+  };
+
+  const navLinkClass = ({ isActive }) =>
+    `text-lg font-semibold transition ${
+      isActive ? "text-yellow-600" : "text-orange-400 hover:text-yellow-600"
+    }`;
+
+  const AuthLinks = ({ onClick }) => (
+    <>
+      <div className="p-2 border-b">
+        <span className="text-xs text-gray-500 px-2">Login</span>
+        <Link
+          to="/login/user"
+          onClick={onClick}
+          className="block px-4 py-2 hover:bg-orange-50 text-sm"
+        >
+          as User
+        </Link>
+        <Link
+          to="/login/admin"
+          onClick={onClick}
+          className="block px-4 py-2 hover:bg-orange-50 text-sm"
+        >
+          as Admin
+        </Link>
+      </div>
+      <div className="p-2">
+        <span className="text-xs text-gray-500 px-2">Signup</span>
+        <Link
+          to="/signup/user"
+          onClick={onClick}
+          className="block px-4 py-2 hover:bg-orange-50 text-sm"
+        >
+          as User
+        </Link>
+        <Link
+          to="/signup/admin"
+          onClick={onClick}
+          className="block px-4 py-2 hover:bg-orange-50 text-sm"
+        >
+          as Admin
+        </Link>
+      </div>
+    </>
+  );
+
+  const UserDropdown = ({ isMobile = false }) => (
+    <div
+      className={`absolute right-0 mt-2 w-52 bg-white border rounded-md shadow-lg z-50 text-sm ${
+        isMobile ? "top-full mt-2" : ""
+      }`}
+    >
+      <div className="px-4 py-2 border-b">
+        <div className="font-medium text-gray-700">{currentUser.email}</div>
+        <div className="text-xs text-gray-500 capitalize">
+          Role: {currentUser.role}
+        </div>
+      </div>
+      <button
+        onClick={() => {
+          handleLogout();
+          if (isMobile) setIsMobileNavOpen(false);
+        }}
+        className="w-full text-left px-4 py-2 text-red-500 hover:bg-red-50"
+      >
+        Logout
+      </button>
+    </div>
+  );
 
   return (
     <header className="sticky top-0 z-50 bg-white shadow-md px-4 py-3">
@@ -27,77 +105,56 @@ export default function Header() {
           <span className="text-xl font-bold text-orange-400">RAGPilot</span>
         </Link>
 
-        {/* Desktop Nav */}
+        {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link
-            to="/"
-            className="text-lg font-semibold text-orange-400 hover:text-yellow-600 transition"
-          >
+          <NavLink to="/" className={navLinkClass}>
             Home
-          </Link>
-          <Link
-            to="/chat"
-            className="text-lg font-semibold text-orange-400 hover:text-yellow-600 transition"
-          >
+          </NavLink>
+          <NavLink to="/chat" className={navLinkClass}>
             Chat
-          </Link>
-          <Link
-            to="/admin"
-            className="text-lg font-semibold text-orange-400 hover:text-yellow-600 transition"
-          >
-            Admin
-          </Link>
+          </NavLink>
+          {isAdmin && (
+            <NavLink to="/admin" className={navLinkClass}>
+              Admin
+            </NavLink>
+          )}
 
-          {/* Dropdown */}
           <div className="relative" ref={dropdownRef}>
-            <button
-              onClick={() => setShowMenu(!showMenu)}
-              className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition"
-            >
-              Login / Signup
-            </button>
-
-            {showMenu && (
-              <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
-                <div className="p-2 border-b">
-                  <span className="text-xs text-gray-500 px-2">Login</span>
-                  <Link
-                    to="/login/user"
-                    className="block px-4 py-2 text-sm hover:bg-orange-50"
-                  >
-                    as User
-                  </Link>
-                  <Link
-                    to="/login/admin"
-                    className="block px-4 py-2 text-sm hover:bg-orange-50"
-                  >
-                    as Admin
-                  </Link>
-                </div>
-                <div className="p-2">
-                  <span className="text-xs text-gray-500 px-2">Signup</span>
-                  <Link
-                    to="/signup/user"
-                    className="block px-4 py-2 text-sm hover:bg-orange-50"
-                  >
-                    as User
-                  </Link>
-                  <Link
-                    to="/signup/admin"
-                    className="block px-4 py-2 text-sm hover:bg-orange-50"
-                  >
-                    as Admin
-                  </Link>
-                </div>
-              </div>
+            {!currentUser ? (
+              <>
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition"
+                >
+                  Login / Signup
+                </button>
+                {isMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-50">
+                    <AuthLinks onClick={() => setIsMenuOpen(false)} />
+                  </div>
+                )}
+              </>
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-semibold hover:bg-orange-600"
+                >
+                  {currentUser.email.charAt(0).toUpperCase()}
+                </button>
+                {isMenuOpen && <UserDropdown />}
+              </>
             )}
           </div>
         </nav>
 
-        {/* Mobile Menu Button */}
+        {/* Mobile Toggle */}
         <div className="md:hidden">
-          <button onClick={() => setShowMobileNav(!showMobileNav)}>
-            {showMobileNav ? (
+          <button
+            onClick={() => setIsMobileNavOpen(!isMobileNavOpen)}
+            aria-label="Toggle navigation"
+          >
+            {isMobileNavOpen ? (
               <X className="h-6 w-6" />
             ) : (
               <Menu className="h-6 w-6" />
@@ -106,62 +163,46 @@ export default function Header() {
         </div>
       </div>
 
-      {/* Mobile Nav Dropdown */}
-      {showMobileNav && (
+      {/* Mobile Navigation */}
+      {isMobileNavOpen && (
         <div className="md:hidden mt-4 space-y-2">
-          <Link
+          <NavLink
             to="/"
-            onClick={() => setShowMobileNav(false)}
+            onClick={() => setIsMobileNavOpen(false)}
             className="block px-4 py-2 text-orange-600 font-medium hover:bg-orange-100"
           >
             Home
-          </Link>
-          <Link
+          </NavLink>
+          <NavLink
             to="/chat"
-            onClick={() => setShowMobileNav(false)}
+            onClick={() => setIsMobileNavOpen(false)}
             className="block px-4 py-2 text-orange-600 font-medium hover:bg-orange-100"
           >
             Chat
-          </Link>
-          <Link
-            to="/admin"
-            onClick={() => setShowMobileNav(false)}
-            className="block px-4 py-2 text-orange-600 font-medium hover:bg-orange-100"
-          >
-            Admin
-          </Link>
-          <div className="border-t pt-2 px-4">
-            <p className="text-sm text-gray-500">Login</p>
-            <Link
-              to="/login/user"
-              onClick={() => setShowMobileNav(false)}
-              className="block py-1 text-sm hover:text-orange-700"
+          </NavLink>
+          {isAdmin && (
+            <NavLink
+              to="/admin"
+              onClick={() => setIsMobileNavOpen(false)}
+              className="block px-4 py-2 text-orange-600 font-medium hover:bg-orange-100"
             >
-              as User
-            </Link>
-            <Link
-              to="/login/admin"
-              onClick={() => setShowMobileNav(false)}
-              className="block py-1 text-sm hover:text-orange-700"
-            >
-              as Admin
-            </Link>
-
-            <p className="text-sm text-gray-500 mt-2">Signup</p>
-            <Link
-              to="/signup/user"
-              onClick={() => setShowMobileNav(false)}
-              className="block py-1 text-sm hover:text-orange-700"
-            >
-              as User
-            </Link>
-            <Link
-              to="/signup/admin"
-              onClick={() => setShowMobileNav(false)}
-              className="block py-1 text-sm hover:text-orange-700"
-            >
-              as Admin
-            </Link>
+              Admin
+            </NavLink>
+          )}
+          <div className="border-t pt-2 px-4 relative" ref={dropdownRef}>
+            {!currentUser ? (
+              <AuthLinks onClick={() => setIsMobileNavOpen(false)} />
+            ) : (
+              <>
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="w-10 h-10 rounded-full bg-orange-500 text-white flex items-center justify-center font-semibold hover:bg-orange-600"
+                >
+                  {currentUser.email.charAt(0).toUpperCase()}
+                </button>
+                {isMenuOpen && <UserDropdown isMobile />}
+              </>
+            )}
           </div>
         </div>
       )}
