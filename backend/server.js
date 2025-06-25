@@ -42,6 +42,10 @@ app.use(
 );
 
 // Routes
+app.get("/", (req, res) => {
+  res.send("Welcome to the Authentication API");
+});
+
 app.use("/auth", authRoutes);
 
 // Start Server
