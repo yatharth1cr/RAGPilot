@@ -14,14 +14,26 @@ export default function ChatBox() {
     setInput("");
     setLoading(true);
 
-    fetch("http://localhost:5000/query", {
+    fetch("http://localhost:5000/rag/query", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ question: input }),
     })
       .then((res) => res.json())
       .then((data) => {
-        setMessages((prev) => [...prev, { sender: "bot", text: data.answer }]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            sender: "bot",
+            text:
+              data.answer +
+              (data.sources?.length
+                ? `\n\n📚 Sources:\n${data.sources
+                    .map((s) => `- ${s.pageContent.slice(0, 80)}...`)
+                    .join("\n")}`
+                : ""),
+          },
+        ]);
       })
       .catch(() => {
         setMessages((prev) => [
