@@ -1,8 +1,9 @@
 import { useState } from "react";
+import axios from "axios";
 
 export default function AdminUpload() {
   const [file, setFile] = useState(null);
-  const [url, setUrl] = useState("");
+  // const [url, setUrl] = useState("");
 
   const uploadPDF = (e) => {
     e.preventDefault();
@@ -11,34 +12,13 @@ export default function AdminUpload() {
     const formData = new FormData();
     formData.append("pdf", file);
 
-    fetch("http://localhost:5000/ingest/pdf", {
-      method: "POST",
-      body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        alert(data.message || "PDF uploaded!");
+    axios
+      .post("http://localhost:5000/rag/upload", formData)
+      .then((res) => {
+        alert(res.data.message || "PDF uploaded!");
       })
       .catch(() => {
         alert("Error uploading PDF.");
-      });
-  };
-
-  const ingestURL = (e) => {
-    e.preventDefault();
-    if (!url) return alert("Please enter a valid URL.");
-
-    fetch("url/", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        alert(data.message || "URL ingested!");
-      })
-      .catch(() => {
-        alert("Error ingesting URL.");
       });
   };
 
@@ -56,7 +36,7 @@ export default function AdminUpload() {
               </span>
             </p>
             <p className="text-red-500 font-semibold">
-              Note: This feature is for admin use only.
+              Note: This feataure is for admin use only.
             </p>
           </div>
 
@@ -72,22 +52,6 @@ export default function AdminUpload() {
               className="w-full bg-orange-600 text-white py-2 rounded-md hover:bg-orange-700 transition cursor-pointer"
             >
               Upload PDF
-            </button>
-          </form>
-
-          <form onSubmit={ingestURL} className="space-y-4">
-            <input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/article"
-              className="w-full px-3 py-2 border rounded-md"
-            />
-            <button
-              type="submit"
-              className="w-full bg-green-600 text-white py-2 rounded-md hover:bg-green-700 transition cursor-pointer"
-            >
-              Ingest URL
             </button>
           </form>
         </div>
