@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
-const dotenv = require("dotenv");
-dotenv.config();
 
+// -------- connect to MongoDB --------
 const connectDB = () => {
   mongoose
     .connect(process.env.MONGO_URI, {
@@ -9,13 +8,12 @@ const connectDB = () => {
       useUnifiedTopology: true,
     })
     .then(() => {
-      console.log("MongoDB connected successfully");
+      console.log("✅ MongoDB connected successfully");
     })
     .catch((error) => {
-      console.error("MongoDB connection failed:", error);
+      console.error("❌ MongoDB connection failed:", error.message);
+      process.exit(1);
     });
 };
-
-// connectDB();
 
 module.exports = connectDB;
